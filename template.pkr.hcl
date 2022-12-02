@@ -8,7 +8,7 @@ packer {
 }
 
 source "amazon-ebs" "nexus" {
-  ami_name      = "CloudTrain-Nexus3-${var.revision}-${legacy_isotime("20060102")}-x86_64-gp2"
+  ami_name      = "CloudTrain-Nexus3-${var.revision}-${legacy_isotime("20060102")}-x86_64-gp3"
   instance_type = var.ec2_instance_type
   region        = var.region_name
   source_ami    = var.source_ami_id
@@ -82,7 +82,7 @@ variable region_name {
 variable revision {
   description = "Revision number (major.minor.path) of the AMI"
   type        = string
-  default     = "0.12.0"
+  default     = "0.12.2"
 }
 
 # TODO: try to replace with AMI filter

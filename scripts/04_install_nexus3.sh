@@ -18,10 +18,9 @@ echo 'Download and unpack Nexus3 package'
 cd /tmp
 sudo curl -L -O https://download.sonatype.com/nexus/3/$NEXUS3_PACKAGE_NAME
 sudo tar xzf $NEXUS3_PACKAGE_NAME
-sudo ls -al
-sudo cp -r nexus-$NEXUS3_VERSION/ $NEXUS_INSTALL_DIR
-sudo ls -al $NEXUS_INSTALL_DIR
-sudo cp -r sonatype-work/nexus3/ $NEXUS_WORK_DIR
+sudo cp -r nexus-$NEXUS3_VERSION/* $NEXUS_INSTALL_DIR/
+git sudo ls -al $NEXUS_INSTALL_DIR
+sudo cp -r sonatype-work/nexus3/* $NEXUS_WORK_DIR/
 sudo ls -al $NEXUS_WORK_DIR
 sudo rm -rf $NEXUS3_PACKAGE_NAME nexus-$NEXUS3_VERSION sonatype-work
 
@@ -36,7 +35,7 @@ echo 'Make runtime user owner of installation directory'
 sudo chown -R nexus:nexus $NEXUS_HOME
 sudo chown -R nexus:nexus $NEXUS_DATA
 
-echo 'Install Nexus3 as a service'
+#echo 'Install Nexus3 as a service'
 sudo ln -s $NEXUS_INSTALL_DIR/bin/nexus /etc/init.d/nexus
 sudo mv -f /tmp/nexus.service /etc/systemd/system/
 sudo systemctl daemon-reload
