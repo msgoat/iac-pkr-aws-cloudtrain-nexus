@@ -7,21 +7,25 @@ packer {
   }
 }
 
+locals {
+  ami_name = "CloudTrain-Nexus3-${var.revision}-${legacy_isotime("20060102")}-${var.ami_architecture}-gp3"
+}
+
 source "amazon-ebs" "nexus" {
-  ami_name      = "CloudTrain-Nexus3-${var.revision}-${legacy_isotime("20060102")}-x86_64-gp3"
+  ami_name      = local.ami_name
   instance_type = var.ec2_instance_type
   region        = var.region_name
-  source_ami    = var.source_ami_id
-  #  source_ami_filter {
-  #    filters = {
-  #      architecture        = "x86_64"
-  #      name                = "amazon/amzn2-ami-*"
-  #      root-device-type    = "ebs"
-  #      virtualization-type = "hvm"
-  #    }
-  #    most_recent = true
-  #    owners      = ["amazon"] # Amazon
-  #  }
+  # source_ami    = var.source_ami_id
+  source_ami_filter {
+    filters = {
+      virtualization-type = "hvm"
+      architecture        = "${var.ami_architecture}"
+      name                = "amzn2-ami-kernel-5.10-hvm-2.0*"
+      root-device-type    = "ebs"
+    }
+    most_recent = true
+    owners      = ["137112412989"] # Amazon
+  }
   ssh_username = "ec2-user"
   launch_block_device_mappings {
     device_name = "/dev/xvda"
@@ -46,6 +50,7 @@ source "amazon-ebs" "nexus" {
     Organization  = "msg systems ag"
     Project       = "CloudTrain"
     Release       = "Latest"
+    Name          = local.ami_name
   }
 }
 
@@ -62,6 +67,10 @@ build {
   }
 
   provisioner "shell" {
+    env = {
+      AMI_ARCHITECTURE = var.ami_architecture
+      NEXUS3_VERSION = var.nexus_version
+    }
     scripts = [
       "./scripts/00_init.sh",
       "./scripts/01_mount_data_volume.sh",
@@ -82,18 +91,23 @@ variable region_name {
 variable revision {
   description = "Revision number (major.minor.path) of the AMI"
   type        = string
-  default     = "0.12.2"
+  default     = "0.14.0"
 }
 
-# TODO: try to replace with AMI filter
-variable source_ami_id {
-  description = "Unique identifier of the source AMI"
+variable ami_architecture {
+  description = "Processor architecture of the AMI, allowed values are `x86_64` or `arm64`"
   type        = string
-  default     = "ami-0ee415e1b8b71305f" # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
+  default     = "x86_64"
 }
 
 variable ec2_instance_type {
   description = "EC2 instance type name"
   type        = string
   default     = "t3a.micro"
+}
+
+variable nexus_version {
+  description = "Nexus OSS version number"
+  type        = string
+  default     = "3.43.0-01"
 }
