@@ -1,7 +1,7 @@
 packer {
   required_plugins {
     amazon = {
-      version = ">= 0.0.2"
+      version = "~> 1.2"
       source  = "github.com/hashicorp/amazon"
     }
   }
@@ -15,7 +15,6 @@ source "amazon-ebs" "nexus" {
   ami_name      = local.ami_name
   instance_type = var.ec2_instance_type
   region        = var.region_name
-  # source_ami    = var.source_ami_id
   source_ami_filter {
     filters = {
       virtualization-type = "hvm"
@@ -33,13 +32,6 @@ source "amazon-ebs" "nexus" {
     volume_type = "gp3"
     volume_size = 8
     delete_on_termination = true
-  }
-  launch_block_device_mappings {
-    device_name = "/dev/xvdb"
-    encrypted = true
-    volume_type = "gp3"
-    volume_size = 32
-    delete_on_termination = false
   }
   tags = {
     Base_AMI_Name = "{{ .SourceAMIName }}"
@@ -61,7 +53,8 @@ build {
     sources = [
       "./resources/nexus.rc",
       "./resources/nexus.service",
-      "./resources/nexus.vmoptions",
+      "./resources/nexus.vmoptions.root_volume",
+      "./resources/nexus.vmoptions.data_volume",
     ]
     destination = "/tmp/"
   }
@@ -69,14 +62,13 @@ build {
   provisioner "shell" {
     env = {
       AMI_ARCHITECTURE = var.ami_architecture
-      NEXUS3_VERSION = var.nexus_version
+      NEXUS_VERSION = var.nexus_version
     }
     scripts = [
       "./scripts/00_init.sh",
-      "./scripts/01_mount_data_volume.sh",
       "./scripts/02_install_awscli2.sh",
       "./scripts/03_install_java8.sh",
-      "./scripts/04_install_nexus3.sh",
+      "./scripts/04_install_nexus.sh",
     ]
   }
 
@@ -91,19 +83,21 @@ variable region_name {
 variable revision {
   description = "Revision number (major.minor.path) of the AMI"
   type        = string
-  default     = "0.14.0"
+  default     = "0.99.0"
 }
 
 variable ami_architecture {
   description = "Processor architecture of the AMI, allowed values are `x86_64` or `arm64`"
   type        = string
-  default     = "x86_64"
+  default     = "arm64"
+#  default     = "x86_64"
 }
 
 variable ec2_instance_type {
   description = "EC2 instance type name"
   type        = string
-  default     = "t3a.micro"
+  default     = "t4g.micro"
+#  default     = "t3.micro"
 }
 
 variable nexus_version {
