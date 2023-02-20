@@ -55,6 +55,7 @@ build {
       "./resources/nexus.service",
       "./resources/nexus.vmoptions.root_volume",
       "./resources/nexus.vmoptions.data_volume",
+      "./resources/on_cloud_init.sh",
     ]
     destination = "/tmp/"
   }
@@ -83,21 +84,21 @@ variable region_name {
 variable revision {
   description = "Revision number (major.minor.path) of the AMI"
   type        = string
-  default     = "0.99.0"
+  default     = "1.0.0"
 }
 
 variable ami_architecture {
   description = "Processor architecture of the AMI, allowed values are `x86_64` or `arm64`"
   type        = string
-  default     = "arm64"
-#  default     = "x86_64"
+#  default     = "arm64"
+  default     = "x86_64"
 }
 
 variable ec2_instance_type {
   description = "EC2 instance type name"
   type        = string
-  default     = "t4g.micro"
-#  default     = "t3.micro"
+#  default     = "t4g.micro"
+  default     = "t3.micro"
 }
 
 variable nexus_version {
