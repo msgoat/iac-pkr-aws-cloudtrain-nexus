@@ -34,8 +34,6 @@ sudo cat $NEXUS_HOME/bin/nexus.vmoptions
 echo "Copy script and configuration files for EC2 launch to nexus user home"
 sudo cp /tmp/nexus.vmoptions.root_volume $SONATYPE_HOME/.local/nexus/
 sudo cp /tmp/nexus.vmoptions.data_volume $SONATYPE_HOME/.local/nexus/
-sudo cp /tmp/on_cloud_init.sh /usr/bin/
-sudo chmod a+x /usr/bin/on_cloud_init.sh
 
 echo "Make runtime user owner of Nexus home directory"
 sudo chown -R nexus:nexus $SONATYPE_HOME

@@ -55,7 +55,6 @@ build {
       "./resources/nexus.service",
       "./resources/nexus.vmoptions.root_volume",
       "./resources/nexus.vmoptions.data_volume",
-      "./resources/on_cloud_init.sh",
     ]
     destination = "/tmp/"
   }
@@ -84,7 +83,7 @@ variable region_name {
 variable revision {
   description = "Revision number (major.minor.path) of the AMI"
   type        = string
-  default     = "1.0.0"
+  default     = "1.2.0"
 }
 
 variable ami_architecture {
@@ -104,5 +103,5 @@ variable ec2_instance_type {
 variable nexus_version {
   description = "Nexus OSS version number"
   type        = string
-  default     = "3.43.0-01"
+  default     = "3.49.0-02"
 }
