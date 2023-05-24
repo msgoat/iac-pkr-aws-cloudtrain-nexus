@@ -83,7 +83,7 @@ variable region_name {
 variable revision {
   description = "Revision number (major.minor.path) of the AMI"
   type        = string
-  default     = "1.2.0"
+  default     = "1.3.0"
 }
 
 variable ami_architecture {
@@ -103,5 +103,5 @@ variable ec2_instance_type {
 variable nexus_version {
   description = "Nexus OSS version number"
   type        = string
-  default     = "3.49.0-02"
+  default     = "3.54.1-01"
 }
