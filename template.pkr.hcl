@@ -83,7 +83,18 @@ variable region_name {
 variable revision {
   description = "Revision number (major.minor.path) of the AMI"
   type        = string
-  default     = "1.4.0"
+}
+
+variable changelist {
+  description = "Branch name"
+  type        = string
+  default     = "local"
+}
+
+variable sha1 {
+  description = "Short commit hash of code base"
+  type        = string
+  default     = "12345678"
 }
 
 variable ami_architecture {

@@ -1,0 +1,43 @@
+version: 0.2
+
+env:
+  parameter-store:
+    CLOUDTRAIN_CODEBUILD_GIT_TAG_USER: "CLOUDTRAIN_CODEBUILD_GIT_TAG_USER"
+    CLOUDTRAIN_CODEBUILD_GIT_TAG_EMAIL: "CLOUDTRAIN_CODEBUILD_GIT_TAG_EMAIL"
+  secrets-manager:
+    GITHUB_TOKEN: "cloudtrain-codebuild-github:msgoat_pat"
+
+phases:
+  install:
+    on-failure: ABORT
+    commands:
+      - echo "Running phase install"
+      - echo "Download and run common installation script"
+      - aws s3 cp s3://s3-eu-west-1-cloudtrain-codebuild-shared/cloudtrain-codebuild-install-packer.sh ~/
+      - chmod u+x ~/cloudtrain-codebuild-install-packer.sh
+      - ~/cloudtrain-codebuild-install-packer.sh
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - echo "Running phase pre_build"
+  build:
+    on-failure: ABORT
+    commands:
+      - echo "Running phase build"
+      - export GIT_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF:11}
+      - export VERSION_REVISION=$(<revision.txt)
+      - export VERSION_CHANGELIST=${GIT_BRANCH:-main}
+      - export VERSION_SHA1=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}
+      - export PROJECT_VERSION=$VERSION_REVISION.$VERSION_CHANGELIST.$VERSION_SHA1
+      - echo "Building AMI image with packer using project version [$PROJECT_VERSION]"
+      - packer init .
+      - packer build -color=false -var revision=$VERSION_REVISION -var changelist=$VERSION_CHANGELIST -var sha1=$VERSION_SHA1 template.pkr.hcl
+      - echo "Tag branch [$VERSION_CHANGELIST] with git tag [$PROJECT_VERSION] on behalf of CodeBuild initiator [$CODEBUILD_INITIATOR] and GitHub actor [$CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID]"
+      - git config user.name "$CLOUDTRAIN_CODEBUILD_GIT_TAG_USER"
+      - git config user.email "$CLOUDTRAIN_CODEBUILD_GIT_TAG_EMAIL"
+      - git tag -a $PROJECT_VERSION -m "$CODEBUILD_BUILD_ARN"
+      - git remote set-url origin "https://$GITHUB_TOKEN@github.com/msgoat/iac-pkr-aws-cloudtrain-nexus.git"
+      - git push origin HEAD:$VERSION_CHANGELIST $PROJECT_VERSION
+  post_build:
+    commands:
+      - echo "Running phase post_build"
