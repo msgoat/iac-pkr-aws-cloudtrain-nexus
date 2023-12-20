@@ -19,7 +19,7 @@ source "amazon-ebs" "nexus" {
     filters = {
       virtualization-type = "hvm"
       architecture        = "${var.ami_architecture}"
-      name                = "amzn2-ami-kernel-5.10-hvm-2.0*"
+      name                = "al2023-ami-minimal-*"
       root-device-type    = "ebs"
     }
     most_recent = true
@@ -114,5 +114,5 @@ variable ec2_instance_type {
 variable nexus_version {
   description = "Nexus OSS version number"
   type        = string
-  default     = "3.59.0-01"
+  default     = "3.63.0-01"
 }
