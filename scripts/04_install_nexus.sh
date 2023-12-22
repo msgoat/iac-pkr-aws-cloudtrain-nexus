@@ -44,20 +44,6 @@ sudo cp /tmp/nexus.vmoptions.data_volume $SONATYPE_HOME/.local/nexus/
 echo "Make runtime user owner of Nexus home directory"
 sudo chown -R nexus:nexus $SONATYPE_HOME
 
-#echo "Starting nexus"
-#sudo -Hu nexus $NEXUS_HOME/bin/nexus start
-#echo "Getting nexus status"
-#NEXUS_STATUS=$(sudo -Hu nexus $NEXUS_HOME/bin/nexus status)
-#echo "Got nexus status [$NEXUS_STATUS]"
-#echo "Stopping nexus"
-#sudo -Hu nexus $NEXUS_HOME/bin/nexus stop
-
-#if [ "$NEXUS_STATUS" != "nexus is running." ]
-#then
-#  echo "Expected nexus status [nexus is running.] but was [$NEXUS_STATUS]; abort..."
-#  exit 1
-#fi
-
 echo "Install Nexus3 as a service"
 sudo ln -s $NEXUS_HOME/bin/nexus /etc/init.d/nexus
 sudo mv -f /tmp/nexus.service /etc/systemd/system/

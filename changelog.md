@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Fixed
 
+## [3.0.1] - 2023-12-22
+### Fixed
+- Minor fixes after Amazon Linux 2023 upgrade
+
 ## [3.0.0] - 2023-12-20
 ### Changed
 - Upgraded OS to Amazon Linux 2023
