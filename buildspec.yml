@@ -1,6 +1,8 @@
 version: 0.2
 
 env:
+  variables:
+    IAC_ARTIFACT_ID: iac-pkr-aws-cloudtrain-nexus
   parameter-store:
     CLOUDTRAIN_CODEBUILD_GIT_TAG_USER: "CLOUDTRAIN_CODEBUILD_GIT_TAG_USER"
     CLOUDTRAIN_CODEBUILD_GIT_TAG_EMAIL: "CLOUDTRAIN_CODEBUILD_GIT_TAG_EMAIL"
@@ -28,15 +30,15 @@ phases:
       - export VERSION_REVISION=$(<revision.txt)
       - export VERSION_CHANGELIST=${GIT_BRANCH:-main}
       - export VERSION_SHA1=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}
-      - export PROJECT_VERSION=$VERSION_REVISION.$VERSION_CHANGELIST.$VERSION_SHA1
+      - export PROJECT_VERSION=$VERSION_REVISION.$CODEBUILD_BUILD_NUMBER.$VERSION_CHANGELIST.$VERSION_SHA1
       - echo "Building AMI image with packer using project version [$PROJECT_VERSION]"
       - packer init .
-      - packer build -color=false -var revision=$VERSION_REVISION -var changelist=$VERSION_CHANGELIST -var sha1=$VERSION_SHA1 template.pkr.hcl
+      - packer build -color=false -var revision=$VERSION_REVISION -var changelist=$VERSION_CHANGELIST -var sha1=$VERSION_SHA1 -var build_number=$CODEBUILD_BUILD_NUMBER -var build_id=$CODEBUILD_BUILD_ID template.pkr.hcl
       - echo "Tag branch [$VERSION_CHANGELIST] with git tag [$PROJECT_VERSION] on behalf of CodeBuild initiator [$CODEBUILD_INITIATOR] and GitHub actor [$CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID]"
       - git config user.name "$CLOUDTRAIN_CODEBUILD_GIT_TAG_USER"
       - git config user.email "$CLOUDTRAIN_CODEBUILD_GIT_TAG_EMAIL"
       - git tag -a $PROJECT_VERSION -m "$CODEBUILD_BUILD_ARN"
-      - git remote set-url origin "https://$GITHUB_TOKEN@github.com/msgoat/iac-pkr-aws-cloudtrain-nexus.git"
+      - git remote set-url origin "https://$GITHUB_TOKEN@github.com/msgoat/$IAC_ARTIFACT_ID
       - git push origin HEAD:$VERSION_CHANGELIST $PROJECT_VERSION
   post_build:
     commands:
